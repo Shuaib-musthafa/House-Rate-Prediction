@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result - House Price Predictor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .price {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .currency {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .details {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .details h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .detail-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .detail-item strong {
+            color: #333;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .detail-item span {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .disclaimer {
+            background: #fff3cd;
+            color: #856404;
+            padding: 1rem;
+            border-radius: 5px;
+            border-left: 4px solid #ffc107;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .buttons {
+                flex-direction: column;
+            }
+            
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏠 Price Prediction Result</h1>
+        
+        <div class="result-card">
+            <div class="price">₹{{ "{:,}".format(prediction|int) }}</div>
+            <div class="currency">Estimated House Price</div>
+        </div>
+        
+        <div class="details">
+            <h3>House Details Used for Prediction</h3>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <strong>🛏️ Bedrooms</strong>
+                    <span>{{ bedrooms }}</span>
+                </div>
+                <div class="detail-item">
+                    <strong>🚿 Bathrooms</strong>
+                    <span>{{ bathrooms }}</span>
+                </div>
+                <div class="detail-item">
+                    <strong>📐 Living Area</strong>
+                    <span>{{ "{:,}".format(living_area) }} sq ft</span>
+                </div>
+                <div class="detail-item">
+                    <strong>🏠 Condition</strong>
+                    <span>{{ condition }}/5</span>
+                </div>
+                <div class="detail-item">
+                    <strong>🏫 Schools Nearby</strong>
+                    <span>{{ schools_nearby }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <a href="/" class="btn btn-primary">🔄 New Prediction</a>
+            <button onclick="window.print()" class="btn btn-secondary">🖨️ Print Result</button>
+        </div>
+        
+        <div class="disclaimer">
+            <strong>Disclaimer:</strong> This prediction is based on a machine learning model trained on historical data. 
+            Actual house prices may vary due to market conditions, location specifics, and other factors not included in the model.
+        </div>
+    </div>
+    
+    <script>
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate the price on load
+            const priceElement = document.querySelector('.price');
+            const originalPrice = priceElement.textContent;
+            priceElement.textContent = '₹0';
+            
+            // Animate to actual price
+            const targetPrice = parseInt(originalPrice.replace('₹', '').replace(/,/g, ''));
+            let currentPrice = 0;
+            const increment = targetPrice / 50;
+            
+            const timer = setInterval(() => {
+                currentPrice += increment;
+                if (currentPrice >= targetPrice) {
+                    currentPrice = targetPrice;
+                    clearInterval(timer);
+                }
+                priceElement.textContent = '₹' + Math.floor(currentPrice).toLocaleString();
+            }, 30);
+        });
+    </script>
+</body>
+</html>
